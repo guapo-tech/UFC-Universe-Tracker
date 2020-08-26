@@ -1,29 +1,18 @@
-public class RankingOverviewController {
-    
-    public String Champion {get; set;}
-    
-    public String champPhotoURL {get; set;}
+public class EventOverviewController {
+     public List<Fight__c> currentEventFightsList {get; set;}
     
     public String Weightclass {get; set;}
     
-    public List<Fighter__c> currentRankedList {get; set;}
-    
-    public RankingOverviewController(ApexPages.StandardController controller) {
-        
-        Fighter__c currentRecord = (Fighter__c)controller.getRecord();
-        
-        Fighter__c currentFighter = [SELECT Id, Name, Weightclass__c FROM Fighter__c WHERE Id =:currentRecord.id];
-        
-        Fighter__c currentChamp = [SELECT Name, Weightclass__c, Photo_URL__c FROM Fighter__c WHERE Weightclass__c =: currentFighter.Weightclass__c AND Champion__c = true];
-        
-        Champion = currentChamp.Name;
-        Weightclass = currentChamp.Weightclass__c;
-        champPhotoURL = currentChamp.Photo_URL__c;
-        
-        currentRankedList = [SELECT Name, Rank__c FROM Fighter__c WHERE Weightclass__c =: currentFighter.Weightclass__c AND Rank__c != null ORDER BY Rank__c];
-        
-        
-    }
-    
-    
+   public EventOverviewController(ApexPages.StandardController controller) {
+       
+       Event__c currentEvent = (Event__c)controller.getRecord();
+       
+       currentEventFightsList = [SELECT Red_Corner__r.Photo_URL__c, Blue_Corner__r.Photo_URL__c, Red_Corner__r.Rank__c, Boutorder__c,
+                                 Blue_Corner__r.Rank__c, Red_Corner__r.Name, Blue_Corner__r.Name, Fight_result__c, Result__c,
+                                 Red_Corner__r.Weightclass__c
+                            FROM Fight__c WHERE Event__c =:currentEvent.id ORDER BY Boutorder__c ASC ];
+       
+       
+
+}
 }
