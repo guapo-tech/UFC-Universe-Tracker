@@ -177,3 +177,6 @@ If winning fighter wins a championship match as a challenger, the original champ
 If winning fighter has higher rank than losing fighter, nothing happens.
 
 If winning fighter is unranked and beats a ranked fighter, winning fighter gets the rank of losing fighter and everyone below drops one spot.
+
+## Fighter image
+You can add an image to a fighter's profile. In the edit popup on the fighter page, you can add an image url. You can also bulk edit on the fighter overview page, if you create an appropriate list view.
