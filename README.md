@@ -165,6 +165,7 @@ At the moment, the rankings are only visible on the Fighter overview page, but I
 
 ## Rankings
 Right now the automated rankings work as follows;
+
 If winning fighter has lower rank than losing fighter, winning fighter will get the rank of losing fighter, losing fighter and everyone below drops one spot.
 
 If winning fighter wins a championship match as a challenger, the original champion will get the rank of the challenger.
