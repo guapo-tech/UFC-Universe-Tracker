@@ -145,7 +145,7 @@ Click on the downward arrow on the Event tab, and click 'New Event'.
 
 ![page layout](/screen21.png?raw=true)
 
-This is is pretty self explanatory, pick a Name, Date and Venue, and do not check 'Finished' yet, and click save. This takes you to the Event Overview page, but there is not a lot to see yet.
+This is is pretty self explanatory, pick a Name, Date and Venue, and do not check 'Finished' yet, and click save. This takes you to the Event Overview page.
 
 On the right hand side, you should see 'Fights (0)', with an option to add Fights.
 
