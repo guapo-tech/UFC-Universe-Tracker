@@ -1,0 +1,160 @@
+public class EventTriggerHandler {
+    
+    public static void OnBeforeInsert(List<Event__c> newList) { }
+    
+    public static void OnAfterInsert(List<Event__c> newList) {
+        //        sync(null, newList);
+    }
+    
+    public static void OnBeforeUpdate(Map<Id, Event__c> oldMap, List<Event__c> newList) { }
+    
+    public static void OnAfterUpdate(Map<Id, Event__c> oldMap, List<Event__c> newList) {
+        sync(oldMap, newList);
+    }
+    
+    public static void OnAfterDelete(Map<Id, Event__c> oldMap) { }
+    
+    private static void sync(Map<Id, Event__c> oldMap, List<Event__c> newList) {
+        // get the losing fighters on the card
+        List<Fight__c> fightList = new List<Fight__c>();
+        List<Id> losingFighterIdList = new List<Id>();
+        List<Id> winningFighterIdList = new List<Id>();
+        List<Fighter__c> winningFighterList = new List<Fighter__c>();
+        for (Event__c e : newList) {
+            if (e.Finished__c) {
+                fightList = [SELECT Red_Corner__c, Blue_Corner__c, Fight_result__c, Result__c
+                             FROM Fight__c WHERE Event__c =:e.id];
+                for (Fight__c f : fightList) {
+                    switch on f.Result__c.substring(0,3) {
+                        when 'Red' {
+                            losingFighterIdList.add(f.Blue_Corner__c);
+                            
+                        }
+                        when 'Blu' {
+                            losingFighterIdList.add(f.Red_Corner__c);
+                        }
+                    }
+                }
+            }
+            
+        }
+        
+        
+        // give the losing fighters a random injury
+        List<Fighter__c> losingFighterList = [SELECT Id, Name, Injury__c FROM Fighter__C WHERE Id in :losingFighterIdList];
+        List<String> injuryPicklist = new List<String>();
+        
+        // get picklist values from injury field
+        Schema.DescribeFieldResult fieldResult = Fighter__c.Injury__c.getDescribe();
+        List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
+        for(Schema.PicklistEntry pickListVal : ple) {
+            injuryPicklist.add(pickListVal.getLabel());
+        }
+        for (Fighter__c fighter : losingFighterList) {
+            if ((Math.random() * 3) <= 1) {
+                System.debug('this');
+                fighter.Injury__c = injuryPicklist[Integer.valueof((Math.random() * injuryPicklist.size()))];
+            } else {
+                fighter.Injury__c = 'None';
+            }
+        }
+        System.debug('fighterswithInjury: ' + losingFighterList);
+        update losingFighterList;
+        
+        List<Fighter__c> fightersToInsert = new List<Fighter__c>();
+        List<Fighter__c> inactiveRedFightersToUpdate = new List<Fighter__c>();
+        List<Fighter__c> inactiveBlueFightersToUpdate = new List<Fighter__c>();
+        
+        // update rankings after event completion
+        for (Event__c e : newList) {
+            if (e.Finished__c) {
+                fightList = [SELECT Red_Corner__c, Blue_Corner__c, Fight_result__c, Result__c, Red_Corner__r.Weightclass__c, Blue_Corner__r.Weightclass__c,
+                             Red_Corner__r.Champion__c, Blue_Corner__r.Champion__c
+                             FROM Fight__c WHERE Event__c =:e.id];
+                for (Fight__c f : fightList) {
+                    switch on f.Result__c.substring(0,3) {
+                        when 'Red' {
+                            Double losingRank = getOpponentRank(f.Blue_Corner__c);
+                            Fighter__c fighterToUpdate = [SELECT Id, Name, Rank__c, Weightclass__c FROM Fighter__c WHERE Id =: f.Red_Corner__c];
+                            Fighter__c losingFighter = [SELECT Id, Rank__c, Weightclass__c FROM Fighter__c WHERE Id =: f.Blue_Corner__c];
+                            String Weightclass = fighterToUpdate.Weightclass__c;
+                            Double winningRank = fighterToUpdate.Rank__c;
+                            System.debug('name: ' + fighterToUpdate.Rank__c +' losingrank: ' + losingRank);
+                            
+                            if (f.Blue_Corner__r.Champion__c) {
+                                losingFighter.Champion__c = false;
+                                losingFighter.Rank__c = fighterToUpdate.Rank__c;
+                                
+                                fighterToUpdate.Rank__c = null;
+                                fighterToUpdate.Champion__c = true;
+                                fightersToInsert.add(fighterToUpdate);
+                                fightersToInsert.add(losingFighter);
+                            }
+                            else if (winningRank > losingRank || winningRank == null ) {
+                                System.debug('ja');
+                                fighterToUpdate.Rank__c = losingRank;
+                                fightersToInsert.add(fighterToUpdate);
+                                
+                                inactiveRedFightersToUpdate = [SELECT Id, Name, Rank__c, Weightclass__C FROM Fighter__c WHERE Weightclass__c =:Weightclass AND Id NOT IN :fightersToInsert]; 
+                                System.debug('inactive 81: ' + inactiveRedFightersToUpdate);
+                                for (Fighter__c fighter : inactiveRedFightersToUpdate) {
+                                    if(fighter.Rank__c != null) {
+                                        System.debug('hier rood');
+                                        fighter.Rank__c += 1; 
+                                    }
+                                }
+                            }
+                        }
+                        when 'Blu' {
+                            
+                            Double losingRank = getOpponentRank(f.Red_Corner__c);
+                            Fighter__c fighterToUpdate = [SELECT Id, Rank__c, Weightclass__c FROM Fighter__c WHERE Id =: f.Blue_Corner__c];
+                            Fighter__c losingFighter = [SELECT Id, Rank__c, Weightclass__c FROM Fighter__c WHERE Id =: f.Red_Corner__c];
+                            Double winningRank = fighterToUpdate.Rank__c;
+                            if (f.Red_Corner__r.Champion__c) {
+                                losingFighter.Champion__c = false;
+                                losingFighter.Rank__c = fighterToUpdate.Rank__c;
+                                
+                                fighterToUpdate.Rank__c = null;
+                                fighterToUpdate.Champion__c = true;
+                                fightersToInsert.add(fighterToUpdate);
+                                fightersToInsert.add(losingFighter);
+                            }
+                            else if (winningRank > losingRank || winningRank == null) {
+                                fighterToUpdate.Rank__c = losingRank;
+                                fightersToInsert.add(fighterToUpdate);
+                                
+                                inactiveBlueFightersToUpdate = [SELECT Id, Name, Rank__c, Weightclass__C FROM Fighter__c WHERE Weightclass__c =:fighterToUpdate.Weightclass__c AND Id NOT IN :fightersToInsert]; 
+                                
+                                for (Fighter__c fighter : inactiveBlueFightersToUpdate) {
+                                    if(fighter.Rank__c != null && fighter.Rank__c != 15) {
+                                        System.debug('hier blauw');
+                                        fighter.Rank__c += 1; 
+                                    } else if (fighter.Rank__c == 15) {
+                                        fighter.Rank__c = null;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        update fightersToInsert;
+        update inactiveRedFightersToUpdate;
+        update inactiveBlueFightersToUpdate;
+        
+        
+    }
+    
+    private static Double getOpponentRank(Id opponentId) {
+        
+        Fighter__c f = [SELECT Id, Name, Rank__c FROM Fighter__c WHERE Id =: opponentId];
+        
+        Double opponentRank = f.Rank__c;
+        
+        return opponentRank;
+        
+    }
+    
+}
