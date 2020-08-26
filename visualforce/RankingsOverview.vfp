@@ -1,0 +1,95 @@
+<apex:page standardController="Fighter__c" docType="html-5.0" extensions="RankingOverviewController" showHeader="false" applyBodyTag="false" applyHtmlTag="false" standardStylesheets="false">
+    <html>
+        <head>
+            <link href="//db.onlinewebfonts.com/c/22de347a8207b570b446ebedffac36e3?family=Klavika+Web+Medium+Condensed" rel="stylesheet" type="text/css"/>
+            <link href="//db.onlinewebfonts.com/c/2a2b767302dad0d292294c13d63a0c5f?family=DIN2014-Regular" rel="stylesheet" type="text/css"/>
+            <style type="text/css">
+                @font-face {
+                font-family: 'Klavika Web Medium Condensed';
+                src: url(/resource/KlavikaWebMediumCondensed) format("woff");
+                font-style: normal;
+                font-weight: 400;
+                }
+                @font-face {
+                font-family: 'DIN 2014';
+                src: url(/resource/DIN2014) format("woff");
+                font-style: normal;
+                font-weight: 400;
+                }
+                body {
+                font-family: 'Klavika Web Medium Condensed';
+                width: 50%;
+                margin: 0 auto;
+                }
+                .grey {
+                color: #abadb1;
+                opacity: 0.65;
+                }
+                td.versus {
+                padding: 10px;
+                }
+                td.fighter-red, td.fighter-blue {
+                padding: 15px;
+                
+                }
+                
+                div.header-wrapper {
+                width: 50%;
+                margin: 0 auto;
+                margin-top: -25%;
+                }
+                table.ranking-table {
+                width: 100%;
+                margin: 0 auto;
+                border-collapse: collapse;
+                }
+                span.heading {
+                font-size: 28pt;
+                font-weight: bold;
+                
+                }
+                tr.row:hover {
+                background-color: #E0E0E0;
+                }
+                span.weightclass {
+                color: #d20a0a;
+                text-align: left !important;
+                }
+                td.fighter-name {
+                color: #585b63;
+                font-weight: normal;
+                font-family: 'DIN 2014';
+                }
+                td.cell {
+                padding: 5px;
+                }
+                div.champ-wrapper {
+                position: relative;
+                top: 70px;
+                left: -50px;
+                }
+                div.image-wrapper {
+                margin-left: 70%;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="main-component">
+                <div class="header-wrapper">
+                    <div class="champ-wrapper">
+                        <span class="weightclass"><apex:outputText value="{!UPPER(Weightclass)}"/></span><br/>
+                        <span class="heading"><apex:outputText value="{!UPPER(Champion)}"/></span>
+                    </div>
+                    <div class="image-wrapper">
+                        <img src="{!IF(champPhotoURL != null, champPhotoURL, 'https://1.bp.blogspot.com/-uy0g7RCqnAc/W0F3sv_LX-I/AAAAAAAAsfg/MGxG_ErXLh0Fnqlb_BQPVJPbWi__1nMKQCLcBGAs/s1600/Gokhan-Saki_634220_right30.png') }" width="125"/>
+                    </div>
+                </div>
+                <div class="main-card">
+                    <table class="ranking-table">
+                        <apex:repeat value="{!currentRankedList}" var="fighter"><tr><td class="cell">{!fighter.Rank__c}</td><td class="fighter-name cell">{!fighter.Name}</td></tr></apex:repeat>
+                    </table>
+                </div>
+            </div>
+        </body>
+    </html>
+</apex:page>
