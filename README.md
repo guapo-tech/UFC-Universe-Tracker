@@ -55,7 +55,13 @@ Make sure the API names of the fields are matching with those of the fields you 
 >IF(NOT(ISBLANK(Photo_URL__c )),IMAGE( Photo_URL__c , "PHOTO found", 450,296),IMAGE( "https://1.bp.blogspot.com/-uy0g7RCqnAc/W0F3sv_LX-I/AAAAAAAAsfg/MGxG_ErXLh0Fnqlb_BQPVJPbWi__1nMKQCLcBGAs/s1600/Gokhan-Saki_634220_right30.png", "NO INSTRUCTIONS"))
 This adds a 'Unknown Fighter' image to all fighters in your universe, you can change the image URL if you want to something else.
 
-13. Onto the creation of our final Custom Object. Create a new Custom Object called 'Fight' with the fields
+13. Next we are going to create 'Lookup Relationships'. Create a new field on the 'Fight' object, called: 'Event' (datatype: Lookup Relationship). Select 'Related To Event', and click Next. Field Label 'Event', and click Next(3x) and click 'Save & New'.
+
+14. You'll have to create two more of these 'Lookup Relationship' now.
+- Red Corner (related to: 'Fighter')
+- Blue Corner (related to: 'Fighter')
+
+15. Onto the creation of our final Custom Object. Create a new Custom Object called 'Fight' with the fields
 - Boutorder (datatype: number)
 - Championship / Main Event (datatype: checkbox)
 - Result (datatype: picklist, with the following values:
@@ -75,11 +81,7 @@ This adds a 'Unknown Fighter' image to all fighters in your universe, you can ch
 "Blue - Submission", Blue_Corner__r.Name & " via " & "Submission",
 "TBD")´
 
-14. Next we are going to create 'Lookup Relationships'. Create a new field on the 'Fight' object, called: 'Event' (datatype: Lookup Relationship). Select 'Related To Event', and click Next. Field Label 'Event', and click Next(3x) and click 'Save & New'.
 
-15. You'll have to create two more of these 'Lookup Relationship' now.
-- Red Corner (related to: 'Fighter')
-- Blue Corner (related to: 'Fighter')
 
 We are done with the configuration of Objects and Fields, for now. Now you can import your roster. I have added UFCRoster.csv to the repository, you can use this as template. I recommend to add another column for the fighter ranks.
 From Setup, enter Data Import Wizard in the Quick Find box, then select Data Import Wizard.
