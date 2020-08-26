@@ -1,0 +1,29 @@
+public class RankingOverviewController {
+    
+    public String Champion {get; set;}
+    
+    public String champPhotoURL {get; set;}
+    
+    public String Weightclass {get; set;}
+    
+    public List<Fighter__c> currentRankedList {get; set;}
+    
+    public RankingOverviewController(ApexPages.StandardController controller) {
+        
+        Fighter__c currentRecord = (Fighter__c)controller.getRecord();
+        
+        Fighter__c currentFighter = [SELECT Id, Name, Weightclass__c FROM Fighter__c WHERE Id =:currentRecord.id];
+        
+        Fighter__c currentChamp = [SELECT Name, Weightclass__c, Photo_URL__c FROM Fighter__c WHERE Weightclass__c =: currentFighter.Weightclass__c AND Champion__c = true];
+        
+        Champion = currentChamp.Name;
+        Weightclass = currentChamp.Weightclass__c;
+        champPhotoURL = currentChamp.Photo_URL__c;
+        
+        currentRankedList = [SELECT Name, Rank__c FROM Fighter__c WHERE Weightclass__c =: currentFighter.Weightclass__c AND Rank__c != null ORDER BY Rank__c];
+        
+        
+    }
+    
+    
+}
