@@ -1,0 +1,13 @@
+public with sharing class FightHistoryApexController {
+
+    // fetch fights
+    @AuraEnabled
+    public static List<Fight__c> fetchFights(Id recordIdFighter) {
+        
+        List<Fight__c> fightHistoryList = [SELECT Name, Fight_result__c, Event_Name__c FROM Fight__c WHERE Red_corner__c =:recordIdFighter OR Blue_corner__c =:recordIdFighter];
+        
+        System.debug('fightHistory: ' + fightHistoryList);
+        return fightHistoryList;
+        
+    } 
+}
