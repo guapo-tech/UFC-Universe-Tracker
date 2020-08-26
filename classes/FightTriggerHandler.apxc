@@ -1,0 +1,38 @@
+public class FightTriggerHandler {
+
+    public static void OnBeforeInsert(List<Fight__c> newList) { }
+        
+        public static void OnAfterInsert(List<Fight__c> newList) {
+            sync(null, newList);
+        }
+        
+        public static void OnBeforeUpdate(Map<Id, Fight__c> oldMap, List<Fight__c> newList) {
+      //  	sync(oldMap, newList);
+        }
+        public static void OnAfterUpdate(Map<Id, Fight__c> oldMap, List<Fight__c> newList) {
+    //        sync(oldMap, newList);
+        }
+        
+        public static void OnAfterDelete(Map<Id, Fight__c> oldMap) { }
+        
+        // Methods
+    public static void sync(Map<Id, Fight__c> oldMap, List<Fight__c> newList) {
+        List<Fight__c> recordsToUpdate = new List<Fight__c>();
+        
+        recordsToUpdate = [SELECT Name, Red_corner__r.Name, Blue_corner__r.Name, Championship_Main_Event__c FROM Fight__c WHERE Id IN :newList];
+        System.debug('recordsToUpdate: ' + recordsToUpdate);
+        if (newList != null) {
+            for (Fight__c f : recordsToUpdate) {
+                if (f.Championship_Main_Event__c) {
+                f.Name = f.Red_Corner__r.Name + ' vs ' + f.Blue_Corner__r.Name + ' (c)';
+                update f;
+                } else {
+                    f.Name = f.Red_Corner__r.Name + ' vs ' + f.Blue_Corner__r.Name;
+                update f;
+                }
+            }
+            update recordsToUpdate;
+        }
+        
+    }
+}
