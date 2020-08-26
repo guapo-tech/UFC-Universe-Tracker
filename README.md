@@ -124,6 +124,7 @@ That should do it.
 ![page layout](/screen16.png?raw=true)
 
 31. Repeat step 29 and 30, but now for the Event page layout, screenshot below for reference. **Note: There is also a standard object called 'Event', we don't use this one. Always check that the API name of your Event object is 'Event__c'.**
+
 ![page layout](/screen17.png?raw=true)
 ![page layout](/screen18.png?raw=true)
 
@@ -137,22 +138,27 @@ The tool consists of these features
 First of all, make sure you are in the right App. Click on the 9 dots on the top left, this opens the App Launcher, search for your app and launch it!
 
 Click on the downward arrow on the Event tab, and click 'New Event'.
+
 ![page layout](/screen21.png?raw=true)
 
 This is is pretty self explanatory, pick a Name, Date and Venue, and do not check 'Finished' yet, and click save. This takes you to the Event Overview page, but there is not a lot to see yet.
 
 On the right hand side, you should see 'Fights (0)', with an option to add Fights.
+
 ![page layout](/screen22.png?raw=true)
 
 Click on New.
 
 This is the New Fight Wizard, also pretty self explanatory. 
+
 ![page layout](/screen23.png?raw=true)
+
 You can fill in anything for Fight Name, it will automaticly update to 'Red Corner Name vs Blue Corner Name'. Result doesn't have to be filled in right away. In the boutorder field, you can determine where you want to place this fight on the card.
 
 Once you've added all your fights, and the results are in, you can 'finish the event'.
 
 On the Event Overview page click Edit. Check the 'Finished' checkbox and click save. This triggers the automated rankings and the injury generator.
+
 **NOTE: Do this only one time, because every time you save an event with the checkbox 'Finished' checked, it will run the automated rankings and the injury generator. Do you want to edit an event after it has finished? Just uncheck the finished box.**
 
 At the moment, the rankings are only visible on the Fighter overview page, but I'm working on a separate object.
@@ -160,6 +166,9 @@ At the moment, the rankings are only visible on the Fighter overview page, but I
 ## Rankings
 Right now the automated rankings work as follows;
 If winning fighter has lower rank than losing fighter, winning fighter will get the rank of losing fighter, losing fighter and everyone below drops one spot.
+
 If winning fighter wins a championship match as a challenger, the original champion will get the rank of the challenger.
+
 If winning fighter has higher rank than losing fighter, nothing happens.
+
 If winning fighter is unranked and beats a ranked fighter, winning fighter gets the rank of losing fighter and everyone below drops one spot.
