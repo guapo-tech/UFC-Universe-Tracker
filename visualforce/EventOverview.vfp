@@ -1,0 +1,57 @@
+<apex:page standardController="Event__c" docType="html-5.0" extensions="EventOverviewController" showHeader="false" applyBodyTag="false" applyHtmlTag="false" standardStylesheets="false">
+    <html>
+        <head>
+            <link href="//db.onlinewebfonts.com/c/22de347a8207b570b446ebedffac36e3?family=Klavika+Web+Medium+Condensed" rel="stylesheet" type="text/css"/>
+            <style type="text/css">
+                 @font-face {
+            font-family: 'Klavika Web Medium Condensed';
+            src: url(/resource/KlavikaWebMediumCondensed) format("woff");
+            font-style: normal;
+            font-weight: 400;
+            }
+                body {
+                font-family: 'Klavika Web Medium Condensed';
+                width: 50%;
+                margin: 0 auto;
+                }
+                .grey {
+                color: #abadb1;
+                opacity: 0.65;
+                }
+                td.versus {
+                padding: 10px;
+                }
+                td.fighter-red, td.fighter-blue {
+                padding: 15px;
+                }
+                div.header-wrapper {
+                text-align: center;
+                }
+                table.bout-table {
+                width: 100%;
+                border-collapse: collapse;
+                }
+                span.heading {
+                font-size: 28pt;
+                font-weight: bold;
+                color: #d20a0a;
+                }
+                tr.row:hover {
+                background-color: #E0E0E0;
+                }
+                </style>
+        </head>
+        <body>
+            <div class="main-component">
+                <div class="header-wrapper">
+                    <span class="heading">{!Event__c.Name}</span>
+                </div>
+                <div class="main-card">
+                    <table class="bout-table">
+                        <apex:repeat value="{!currentEventFightsList}" var="fighter"><tr class="row"><td class="avatar"><img src="{!IF(fighter.Red_Corner__r.Photo_URL__c != null, fighter.Red_Corner__r.Photo_URL__c, 'https://1.bp.blogspot.com/-uy0g7RCqnAc/W0F3sv_LX-I/AAAAAAAAsfg/MGxG_ErXLh0Fnqlb_BQPVJPbWi__1nMKQCLcBGAs/s1600/Gokhan-Saki_634220_right30.png') }" width="125"/></td><td class="fighter-red"><span class="grey"><apex:outputText rendered="{!fighter.Red_Corner__r.Rank__c != null}">#{!fighter.Red_Corner__r.Rank__c}</apex:outputText></span><br/>{!UPPER(fighter.Red_Corner__r.Name)}</td><td class="versus"><span class="grey weightclass" ><apex:outputText value="{!UPPER(fighter.Red_corner__r.Weightclass__c)}"/>&nbsp;BOUT</span></td><td class="fighter-blue"><span class="grey"><apex:outputText rendered="{!fighter.Blue_Corner__r.Rank__c != null}">#{!fighter.Blue_Corner__r.Rank__c}</apex:outputText></span><br/>{!UPPER(fighter.Blue_Corner__r.Name)}</td><td class="avatar"><img src="{!IF(fighter.Blue_Corner__r.Photo_URL__c != null, fighter.Blue_Corner__r.Photo_URL__c, 'https://1.bp.blogspot.com/-uy0g7RCqnAc/W0F3sv_LX-I/AAAAAAAAsfg/MGxG_ErXLh0Fnqlb_BQPVJPbWi__1nMKQCLcBGAs/s1600/Gokhan-Saki_634220_right30.png') }" width="125"/></td></tr></apex:repeat>
+                    </table>
+                </div>
+            </div>
+        </body>
+    </html>
+</apex:page>
