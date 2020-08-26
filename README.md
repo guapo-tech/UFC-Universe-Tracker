@@ -5,7 +5,7 @@ UFC Universe Tracker provides the tools to transform your Salesforce Developer o
 
 ## Configuration
 **Note: It is really important that you match your field names with the names provided in this manual, they have to be exact matches, or you will run into problems**
-**If your org is in Classic, you will have to switch to Salesforce Lightning, via the link in the top right.
+**If your org is in Classic, you will have to switch to Salesforce Lightning, via the link in the top right.**
 
 1. Go to https://developer.salesforce.com/signup and sign up for a free Developer Edition.
 2. After confirming your e-mail address, you should be taken to the Setup page, if not, click on the gear icon in the right top, and click 'Setup'.
