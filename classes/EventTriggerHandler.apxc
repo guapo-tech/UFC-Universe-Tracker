@@ -69,22 +69,30 @@ public class EventTriggerHandler {
         for (Event__c e : newList) {
             if (e.Finished__c) {
                 fightList = [SELECT Red_Corner__c, Blue_Corner__c, Fight_result__c, Result__c, Red_Corner__r.Weightclass__c, Blue_Corner__r.Weightclass__c,
-                             Red_Corner__r.Champion__c, Blue_Corner__r.Champion__c
+                             Red_Corner__r.Champion__c, Blue_Corner__r.Champion__c, Championship_Main_Event__c
                              FROM Fight__c WHERE Event__c =:e.id];
                 for (Fight__c f : fightList) {
                     switch on f.Result__c.substring(0,3) {
                         when 'Red' {
                             Double losingRank = getOpponentRank(f.Blue_Corner__c);
-                            Fighter__c fighterToUpdate = [SELECT Id, Name, Rank__c, Weightclass__c FROM Fighter__c WHERE Id =: f.Red_Corner__c];
-                            Fighter__c losingFighter = [SELECT Id, Rank__c, Weightclass__c FROM Fighter__c WHERE Id =: f.Blue_Corner__c];
+                            Fighter__c fighterToUpdate = [SELECT Id, Name, Rank__c, Weightclass__c, Wins__c, Losses__c FROM Fighter__c WHERE Id =: f.Red_Corner__c];
+                            Fighter__c losingFighter = [SELECT Id, Rank__c, Weightclass__c, Wins__c, Losses__c FROM Fighter__c WHERE Id =: f.Blue_Corner__c];
                             String Weightclass = fighterToUpdate.Weightclass__c;
                             Double winningRank = fighterToUpdate.Rank__c;
                             System.debug('name: ' + fighterToUpdate.Rank__c +' losingrank: ' + losingRank);
-                            
+                            if (f.Championship_Main_Event__c && (fighterToUpdate.Champion__c == false && losingFighter.Champion__c == false)) {
+                                fighterToUpdate.Champion__c = true;
+                                losingFighter.Champion__c = false;
+                            }
                             if (f.Blue_Corner__r.Champion__c) {
                                 losingFighter.Champion__c = false;
                                 losingFighter.Rank__c = fighterToUpdate.Rank__c;
-                                
+                                fighterToUpdate.Wins__c += 1;
+                                if(losingFighter.Losses__c != null) {
+                                    losingFighter.Losses__c += 1;
+                                } else {
+                                    losingFighter.Losses__c = 1;
+                                }
                                 fighterToUpdate.Rank__c = null;
                                 fighterToUpdate.Champion__c = true;
                                 fightersToInsert.add(fighterToUpdate);
@@ -94,36 +102,71 @@ public class EventTriggerHandler {
                                 System.debug('ja');
                                 fighterToUpdate.Rank__c = losingRank;
                                 fightersToInsert.add(fighterToUpdate);
-                                
+                                fighterToUpdate.Wins__c += 1;
+                                if(losingFighter.Losses__c != null) {
+                                    losingFighter.Losses__c += 1;
+                                } else {
+                                    losingFighter.Losses__c = 1;
+                                }
                                 inactiveRedFightersToUpdate = [SELECT Id, Name, Rank__c, Weightclass__C FROM Fighter__c WHERE Weightclass__c =:Weightclass AND Id NOT IN :fightersToInsert]; 
                                 System.debug('inactive 81: ' + inactiveRedFightersToUpdate);
                                 for (Fighter__c fighter : inactiveRedFightersToUpdate) {
-                                    if(fighter.Rank__c != null) {
-                                        System.debug('hier rood');
+                                    if(fighter.Rank__c != null && fighter.Rank__c != 15) {
+                                        System.debug('hier blauw');
                                         fighter.Rank__c += 1; 
+                                    } else if (fighter.Rank__c == 15) {
+                                        fighter.Rank__c = null;
                                     }
+                                }
+                            } else {
+                                fighterToUpdate.Wins__c += 1;
+                                fightersToInsert.add(fighterToUpdate);
+                                if(losingFighter.Losses__c != null) {
+                                    losingFighter.Losses__c += 1;
+                                    fightersToInsert.add(losingFighter);
+                                } else {
+                                    losingFighter.Losses__c = 1;
+                                    fightersToInsert.add(losingFighter);
                                 }
                             }
                         }
                         when 'Blu' {
                             
                             Double losingRank = getOpponentRank(f.Red_Corner__c);
-                            Fighter__c fighterToUpdate = [SELECT Id, Rank__c, Weightclass__c FROM Fighter__c WHERE Id =: f.Blue_Corner__c];
-                            Fighter__c losingFighter = [SELECT Id, Rank__c, Weightclass__c FROM Fighter__c WHERE Id =: f.Red_Corner__c];
+                            Fighter__c fighterToUpdate = [SELECT Id, Rank__c, Weightclass__c, Wins__c, Losses__c FROM Fighter__c WHERE Id =: f.Blue_Corner__c];
+                            Fighter__c losingFighter = [SELECT Id, Rank__c, Weightclass__c, Wins__c, Losses__c FROM Fighter__c WHERE Id =: f.Red_Corner__c];
                             Double winningRank = fighterToUpdate.Rank__c;
+                            if (f.Championship_Main_Event__c && (fighterToUpdate.Champion__c == false && losingFighter.Champion__c == false)) {
+                                fighterToUpdate.Champion__c = true;
+                                losingFighter.Champion__c = false;
+                            }
                             if (f.Red_Corner__r.Champion__c) {
                                 losingFighter.Champion__c = false;
                                 losingFighter.Rank__c = fighterToUpdate.Rank__c;
-                                
+                                if(losingFighter.Losses__c != null) {
+                                    losingFighter.Losses__c += 1;
+                                } else {
+                                    losingFighter.Losses__c = 1;
+                                }
                                 fighterToUpdate.Rank__c = null;
                                 fighterToUpdate.Champion__c = true;
+                                fighterToUpdate.Wins__c += 1;
                                 fightersToInsert.add(fighterToUpdate);
                                 fightersToInsert.add(losingFighter);
                             }
                             else if (winningRank > losingRank || winningRank == null) {
                                 fighterToUpdate.Rank__c = losingRank;
-                                fightersToInsert.add(fighterToUpdate);
                                 
+                                fighterToUpdate.Wins__c += 1;
+                                fightersToInsert.add(fighterToUpdate);
+                                System.debug('losing: ' + losingFighter);
+                                if(losingFighter.Losses__c != null) {
+                                    losingFighter.Losses__c += 1;
+                                    fightersToInsert.add(losingFighter);
+                                } else {
+                                    losingFighter.Losses__c = 1;
+                                    fightersToInsert.add(losingFighter);
+                                }
                                 inactiveBlueFightersToUpdate = [SELECT Id, Name, Rank__c, Weightclass__C FROM Fighter__c WHERE Weightclass__c =:fighterToUpdate.Weightclass__c AND Id NOT IN :fightersToInsert]; 
                                 
                                 for (Fighter__c fighter : inactiveBlueFightersToUpdate) {
@@ -133,6 +176,16 @@ public class EventTriggerHandler {
                                     } else if (fighter.Rank__c == 15) {
                                         fighter.Rank__c = null;
                                     }
+                                }
+                            } else {
+                                fighterToUpdate.Wins__c += 1;
+                                fightersToInsert.add(fighterToUpdate);
+                                if(losingFighter.Losses__c != null) {
+                                    losingFighter.Losses__c += 1;
+                                    fightersToInsert.add(losingFighter);
+                                } else {
+                                    losingFighter.Losses__c = 1;
+                                    fightersToInsert.add(losingFighter);
                                 }
                             }
                         }
