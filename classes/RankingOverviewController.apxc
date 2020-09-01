@@ -6,6 +6,10 @@ public class RankingOverviewController {
     
     public String Weightclass {get; set;}
     
+    public Boolean hasChamp {get; set;} {
+        hasChamp = false;
+    }
+    
     public List<Fighter__c> currentRankedList {get; set;}
     
     public RankingOverviewController(ApexPages.StandardController controller) {
@@ -14,12 +18,25 @@ public class RankingOverviewController {
         
         Fighter__c currentFighter = [SELECT Id, Name, Weightclass__c FROM Fighter__c WHERE Id =:currentRecord.id];
         
-        Fighter__c currentChamp = [SELECT Name, Weightclass__c, Photo_URL__c FROM Fighter__c WHERE Weightclass__c =: currentFighter.Weightclass__c AND Champion__c = true];
+        try {
+            Fighter__c currentChamp = [SELECT Name, Weightclass__c, Photo_URL__c FROM Fighter__c WHERE Weightclass__c =: currentFighter.Weightclass__c AND Champion__c = true];
+            
+            Champion = currentChamp.Name;
+            Weightclass = currentChamp.Weightclass__c;
+            champPhotoURL = currentChamp.Photo_URL__c;
+        } catch (QueryException e) {
+            System.debug('error: ' + e.getMessage());
+        }
         
-        Champion = currentChamp.Name;
-        Weightclass = currentChamp.Weightclass__c;
-        champPhotoURL = currentChamp.Photo_URL__c;
-        
+        List<Fighter__c> currentWeightclassList = new List<Fighter__c>();
+        currentWeightclassList = [SELECT Name, Rank__c, Champion__c FROM Fighter__c WHERE Weightclass__c =: currentFighter.Weightclass__c];
+        System.debug('Weightclasslist:' + currentWeightclassList);
+        for (Fighter__c f : currentWeightclassList) {
+            if (f.Champion__c) {
+                hasChamp = true;
+            }
+        }
+        System.debug('haschamp: ' + hasChamp);
         currentRankedList = [SELECT Name, Rank__c FROM Fighter__c WHERE Weightclass__c =: currentFighter.Weightclass__c AND Rank__c != null ORDER BY Rank__c];
         
         
