@@ -75,7 +75,7 @@
         </head>
         <body>
             <div class="main-component">
-                <div class="header-wrapper">
+                <apex:outputText rendered="{!hasChamp}"><div class="header-wrapper">
                     <div class="champ-wrapper">
                         <span class="weightclass"><apex:outputText value="{!UPPER(Weightclass)}"/></span><br/>
                         <span class="heading"><apex:outputText value="{!UPPER(Champion)}"/></span>
@@ -83,7 +83,7 @@
                     <div class="image-wrapper">
                         <img src="{!IF(champPhotoURL != null, champPhotoURL, 'https://1.bp.blogspot.com/-uy0g7RCqnAc/W0F3sv_LX-I/AAAAAAAAsfg/MGxG_ErXLh0Fnqlb_BQPVJPbWi__1nMKQCLcBGAs/s1600/Gokhan-Saki_634220_right30.png') }" width="125"/>
                     </div>
-                </div>
+                </div></apex:outputText>
                 <div class="main-card">
                     <table class="ranking-table">
                         <apex:repeat value="{!currentRankedList}" var="fighter"><tr><td class="cell">{!fighter.Rank__c}</td><td class="fighter-name cell">{!fighter.Name}</td></tr></apex:repeat>
